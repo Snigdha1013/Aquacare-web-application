@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AquaCare – Smart Water & Sanitation Awareness</title>
+  <meta name="description" content="AquaCare – SDG 6 aligned educational tool for water conservation, sanitation, and community awareness." />
+  <link rel="stylesheet" href="/css/style.css" />
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <!-- ═══════════════════════════════════════════════════
+       DISCLAIMER BANNER
+  ════════════════════════════════════════════════════ -->
+  <div class="disclaimer-banner" id="disclaimerBanner">
+    <span>⚠️ <strong>AquaCare</strong> is an educational and awareness tool. It does not replace professional lab water testing or municipal water safety reports. Always consult local authorities for water quality emergencies.</span>
+    <button class="disclaimer-close" onclick="document.getElementById('disclaimerBanner').style.display='none'" aria-label="Close disclaimer">✕</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       HEADER / NAV
+  ════════════════════════════════════════════════════ -->
+  <header class="app-header">
+    <div class="header-inner container">
+      <div class="brand">
+        <div class="brand-logo">💧</div>
+        <div class="brand-text">
+          <span class="brand-name">AquaCare</span>
+          <span class="brand-tagline">SDG 6 · 1M1B Initiative</span>
+        </div>
+      </div>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
+      <nav class="main-nav" id="mainNav">
+        <a href="#dashboard" class="nav-link active" data-section="dashboard">🏠 Dashboard</a>
+        <a href="#tracker" class="nav-link" data-section="tracker">💧 Usage</a>
+        <a href="#harvesting" class="nav-link" data-section="harvesting">🌧️ Harvest</a>
+        <a href="#community" class="nav-link" data-section="community">🗺️ Community</a>
+        <a href="#sanitation" class="nav-link" data-section="sanitation">🧼 Hygiene</a>
+        <a href="#tips" class="nav-link" data-section="tips">💡 Tips</a>
+        <a href="#awareness" class="nav-link" data-section="awareness">📚 Learn</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════
+       MAIN CONTENT
+  ════════════════════════════════════════════════════ -->
+  <main class="app-main" id="appMain">
+
+    <!-- ── SECTION 1: DASHBOARD ──────────────────────── -->
+    <section class="page-section active" id="dashboard">
+      <div class="container">
+        <div class="section-header">
+          <h1>📊 My Water Dashboard</h1>
+          <p class="section-sub">Your personal household water overview for the last 7 days</p>
+        </div>
+
+        <!-- Daily Tip Banner -->
+        <div class="tip-banner" id="dailyTipBanner">
+          <div class="tip-banner-icon">💡</div>
+          <div class="tip-banner-content">
+            <span class="tip-label">AI Daily Tip</span>
+            <p id="dailyTipText">Loading your personalised water-saving tip…</p>
+          </div>
+          <button class="btn btn-sm btn-outline" id="refreshTipBtn">Refresh</button>
+        </div>
+
+        <!-- Water Stress Alert -->
+        <div class="alert-card alert-warning hidden" id="waterStressAlert">
+          <span class="alert-icon">🚨</span>
+          <div>
+            <strong>High Water Consumption Detected</strong>
+            <p id="waterStressMsg">Your household water usage has exceeded 250 L/person for 3+ days. Consider exploring water recycling habits.</p>
+          </div>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon blue">💧</div>
+            <div class="stat-body">
+              <span class="stat-label">Today's Usage</span>
+              <span class="stat-value" id="statTodayUsage">0 L</span>
+              <span class="stat-note" id="statUsageNote">No logs yet today</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon cyan">📅</div>
+            <div class="stat-body">
+              <span class="stat-label">7-Day Average</span>
+              <span class="stat-value" id="stat7DayAvg">0 L</span>
+              <span class="stat-note">Daily household average</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon teal">🧼</div>
+            <div class="stat-body">
+              <span class="stat-label">Hygiene Score</span>
+              <span class="stat-value" id="statHygieneScore">—</span>
+              <span class="stat-note">Today's checklist</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">🗺️</div>
+            <div class="stat-body">
+              <span class="stat-label">Issues Logged</span>
+              <span class="stat-value" id="statIssuesLogged">0</span>
+              <span class="stat-note">Community reports</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="charts-row">
+          <div class="chart-card">
+            <h3>💧 Daily Water Usage (L) — Last 7 Days</h3>
+            <div class="chart-wrap"><canvas id="usageChart"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3>🧼 Hygiene Check-in Scores — Last 7 Days</h3>
+            <div class="chart-wrap"><canvas id="hygieneChart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="charts-row">
+          <div class="chart-card">
+            <h3>🏷️ Water Usage by Activity</h3>
+            <div class="chart-wrap chart-wrap-sm"><canvas id="activityChart"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3>🌧️ Estimated Monthly Rainwater Harvest (L)</h3>
+            <div class="chart-wrap chart-wrap-sm"><canvas id="harvestChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION 2: WATER USAGE TRACKER ───────────── -->
+    <section class="page-section" id="tracker">
+      <div class="container">
+        <div class="section-header">
+          <h1>💧 Household Water Usage Tracker</h1>
+          <p class="section-sub">Log your daily water activities and track against your conservation goal</p>
+        </div>
+
+        <div class="tracker-layout">
+          <!-- Log Form -->
+          <div class="card">
+            <h2 class="card-title">➕ Log Water Activity</h2>
+            <form id="usageForm" class="usage-form">
+              <div class="form-group">
+                <label for="activityType">Activity</label>
+                <select id="activityType" required>
+                  <option value="">— Select Activity —</option>
+                  <option value="drinking">🥤 Drinking</option>
+                  <option value="cooking">🍳 Cooking</option>
+                  <option value="washing">🚿 Washing / Bathing</option>
+                  <option value="laundry">👕 Laundry</option>
+                  <option value="gardening">🌱 Gardening / Irrigation</option>
+                  <option value="toilet">🚽 Toilet Flushing</option>
+                  <option value="other">📦 Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="activityAmount">Amount (Litres)</label>
+                <input type="number" id="activityAmount" min="0.1" max="10000" step="0.1" placeholder="e.g. 15" required />
+              </div>
+              <div class="form-group">
+                <label for="activityNote">Note (optional)</label>
+                <input type="text" id="activityNote" placeholder="e.g. Long shower today" maxlength="100" />
+              </div>
+              <div class="form-group">
+                <label for="activityDate">Date</label>
+                <input type="date" id="activityDate" required />
+              </div>
+              <div class="form-group">
+                <label for="householdSize">Household Size (persons)</label>
+                <input type="number" id="householdSize" min="1" max="50" value="4" />
+              </div>
+              <button type="submit" class="btn btn-primary btn-full">Log Activity</button>
+            </form>
+          </div>
+
+          <!-- Progress & Summary -->
+          <div class="tracker-right">
+            <div class="card">
+              <h2 class="card-title">🎯 Today's Goal</h2>
+              <div class="goal-settings">
+                <label for="dailyGoal">Daily household goal (L)</label>
+                <div class="goal-input-row">
+                  <input type="number" id="dailyGoal" min="10" max="2000" value="150" />
+                  <button class="btn btn-sm btn-outline" id="saveGoalBtn">Save</button>
+                </div>
+              </div>
+              <div class="progress-section">
+                <div class="progress-header">
+                  <span id="progressLabel">0 / 150 L</span>
+                  <span id="progressPct">0%</span>
+                </div>
+                <div class="progress-bar-outer">
+                  <div class="progress-bar-inner" id="usageProgressBar" style="width:0%"></div>
+                </div>
+                <p class="progress-note" id="progressNote">Start logging to track your goal.</p>
+              </div>
+            </div>
+
+            <div class="card">
+              <h2 class="card-title">📋 Today's Log</h2>
+              <div id="todayLogList" class="log-list">
+                <p class="empty-state">No logs for today yet. Start tracking above! 💧</p>
+              </div>
+              <div class="log-total">
+                <span>Total Today:</span>
+                <strong id="todayTotal">0 L</strong>
+              </div>
+            </div>
+
+            <div class="card">
+              <h2 class="card-title">🗂️ Weekly Log History</h2>
+              <div id="weeklyLogList" class="log-list log-list-compact">
+                <p class="empty-state">No history yet.</p>
+              </div>
+              <button class="btn btn-sm btn-danger" id="clearUsageBtn">🗑️ Clear All Logs</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reduction Reminders -->
+        <div class="card reminders-card" id="reductionReminders">
+          <h2 class="card-title">🔔 Reduction Reminders</h2>
+          <div id="remindersContent" class="reminders-grid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION 3: RAINWATER HARVESTING CALCULATOR ─ -->
+    <section class="page-section" id="harvesting">
+      <div class="container">
+        <div class="section-header">
+          <h1>🌧️ Rainwater Harvesting Calculator</h1>
+          <p class="section-sub">Estimate how much rainwater your roof can collect and save each month</p>
+        </div>
+
+        <div class="harvesting-layout">
+          <div class="card">
+            <h2 class="card-title">📐 Enter Your Details</h2>
+            <form id="harvestForm" class="usage-form">
+              <div class="form-group">
+                <label for="roofArea">Roof / Catchment Area (m²)</label>
+                <input type="number" id="roofArea" min="1" max="10000" step="0.1" placeholder="e.g. 80" required />
+                <span class="form-hint">Measure the horizontal footprint of your roof</span>
+              </div>
+              <div class="form-group">
+                <label for="roofMaterial">Roof Material</label>
+                <select id="roofMaterial">
+                  <option value="0.80">🏠 Corrugated Iron / Metal (80% efficiency)</option>
+                  <option value="0.75">🏡 Clay / Concrete Tiles (75% efficiency)</option>
+                  <option value="0.70">🏘️ Asphalt Shingles (70% efficiency)</option>
+                  <option value="0.60">🌿 Green / Thatch Roof (60% efficiency)</option>
+                  <option value="0.90">🏢 Smooth Concrete / Terrace (90% efficiency)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="rainfallMonth">Average Monthly Rainfall (mm)</label>
+                <input type="number" id="rainfallMonth" min="0" max="1000" step="1" placeholder="e.g. 85" required />
+                <span class="form-hint">Find your city's average at weather services</span>
+              </div>
+              <div class="form-group">
+                <label for="storageCapacity">Storage Tank Capacity (L) — optional</label>
+                <input type="number" id="storageCapacity" min="0" max="1000000" step="1" placeholder="e.g. 5000" />
+              </div>
+              <button type="submit" class="btn btn-primary btn-full">Calculate Harvest</button>
+            </form>
+          </div>
+
+          <div class="card harvest-results" id="harvestResults">
+            <h2 class="card-title">📊 Estimated Results</h2>
+            <div id="harvestResultContent" class="harvest-result-placeholder">
+              <div class="placeholder-icon">🌧️</div>
+              <p>Fill in the form and click Calculate to see your estimates.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">💡 How Rainwater Harvesting Works</h2>
+          <div class="how-it-works-grid">
+            <div class="hiw-step">
+              <div class="hiw-num">1</div>
+              <h4>Collect</h4>
+              <p>Rain falls on your roof and flows into gutters</p>
+            </div>
+            <div class="hiw-step">
+              <div class="hiw-num">2</div>
+              <h4>Filter</h4>
+              <p>Passes through a first-flush diverter to remove debris</p>
+            </div>
+            <div class="hiw-step">
+              <div class="hiw-num">3</div>
+              <h4>Store</h4>
+              <p>Stored in tanks or barrels (covered to prevent mosquitoes)</p>
+            </div>
+            <div class="hiw-step">
+              <div class="hiw-num">4</div>
+              <h4>Use</h4>
+              <p>Used for gardening, toilet flushing, laundry, or (after treatment) drinking</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION 4: COMMUNITY ISSUE LOGGER ────────── -->
+    <section class="page-section" id="community">
+      <div class="container">
+        <div class="section-header">
+          <h1>🗺️ Community Water Issue Logger</h1>
+          <p class="section-sub">Report and track local water and sanitation problems in your community</p>
+        </div>
+
+        <div class="community-layout">
+          <div class="card">
+            <h2 class="card-title">📝 Report an Issue</h2>
+            <form id="issueForm" class="usage-form">
+              <div class="form-group">
+                <label for="issueType">Issue Type</label>
+                <select id="issueType" required>
+                  <option value="">— Select Issue —</option>
+                  <option value="pipe_leak">🔧 Pipe Leak / Burst</option>
+                  <option value="contamination">⚗️ Contaminated Tap Water</option>
+                  <option value="no_supply">🚫 No Water Supply</option>
+                  <option value="drainage">🌊 Blocked / Poor Drainage</option>
+                  <option value="sanitation">🚽 Broken Sanitation Facility</option>
+                  <option value="flooding">🌧️ Flood / Waterlogging</option>
+                  <option value="other">📌 Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="issueLocation">Location / Area</label>
+                <input type="text" id="issueLocation" placeholder="e.g. Block 4, Main Street, Ward 7" maxlength="150" required />
+              </div>
+              <div class="form-group">
+                <label for="issueSeverity">Severity</label>
+                <select id="issueSeverity" required>
+                  <option value="low">🟢 Low — Minor inconvenience</option>
+                  <option value="medium">🟡 Medium — Affects daily use</option>
+                  <option value="high">🔴 High — Urgent public health risk</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="issueDescription">Description</label>
+                <textarea id="issueDescription" rows="3" placeholder="Describe the issue in detail…" maxlength="500" required></textarea>
+              </div>
+              <div class="form-group">
+                <label for="reporterName">Your Name (optional)</label>
+                <input type="text" id="reporterName" placeholder="Anonymous" maxlength="80" />
+              </div>
+              <button type="submit" class="btn btn-primary btn-full">Submit Report</button>
+            </form>
+          </div>
+
+          <div class="community-board">
+            <div class="board-header">
+              <h2 class="card-title">📋 Community Report Board</h2>
+              <div class="board-filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="high">🔴 High</button>
+                <button class="filter-btn" data-filter="medium">🟡 Medium</button>
+                <button class="filter-btn" data-filter="low">🟢 Low</button>
+              </div>
+            </div>
+            <div id="issueBoard" class="issue-board">
+              <p class="empty-state">No community issues reported yet. Be the first to report! 🗺️</p>
+            </div>
+            <button class="btn btn-sm btn-danger" id="clearIssuesBtn">🗑️ Clear All Reports</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION 5: SANITATION & HYGIENE TRACKER ──── -->
+    <section class="page-section" id="sanitation">
+      <div class="container">
+        <div class="section-header">
+          <h1>🧼 Sanitation & Hygiene Tracker</h1>
+          <p class="section-sub">Build daily hygiene habits and earn your hygiene score</p>
+        </div>
+
+        <div class="sanitation-layout">
+          <div class="card">
+            <h2 class="card-title">✅ Today's Hygiene Checklist</h2>
+            <p class="card-sub">Check off habits as you complete them throughout the day</p>
+            <div id="hygieneChecklist" class="hygiene-checklist">
+              <!-- populated by JS -->
+            </div>
+            <button class="btn btn-primary btn-full mt-16" id="saveHygieneBtn">💾 Save Today's Score</button>
+          </div>
+
+          <div class="sanitation-right">
+            <div class="card score-card">
+              <h2 class="card-title">🏆 Today's Score</h2>
+              <div class="score-display">
+                <div class="score-ring" id="scoreRing">
+                  <svg viewBox="0 0 120 120">
+                    <circle class="score-bg" cx="60" cy="60" r="50"/>
+                    <circle class="score-fill" id="scoreCircle" cx="60" cy="60" r="50" stroke-dasharray="0 314"/>
+                  </svg>
+                  <div class="score-text" id="scoreText">0%</div>
+                </div>
+                <div class="score-label" id="scoreLabel">Start checking off habits!</div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h2 class="card-title">📅 7-Day Hygiene History</h2>
+              <div id="hygieneHistory" class="hygiene-history">
+                <p class="empty-state">No history yet.</p>
+              </div>
+            </div>
+
+            <div class="card">
+              <h2 class="card-title">💡 Why Hygiene Matters</h2>
+              <ul class="hygiene-facts">
+                <li>🤲 Proper handwashing reduces diarrhoeal disease risk by up to <strong>40%</strong></li>
+                <li>💧 Boiling water for 1 minute kills most waterborne pathogens</li>
+                <li>🚽 Open defecation affects <strong>2 billion</strong> people worldwide — sanitation saves lives</li>
+                <li>🧴 Clean water + soap prevents 1.4M child deaths per year</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION 6 + 7: TIPS & AWARENESS ──────────── -->
+    <section class="page-section" id="tips">
+      <div class="container">
+        <div class="section-header">
+          <h1>💡 Water-Saving Action Library</h1>
+          <p class="section-sub">Practical conservation tips for homes, schools, and agriculture</p>
+        </div>
+
+        <div class="tips-filter-bar">
+          <button class="filter-btn active" data-category="all">🌍 All</button>
+          <button class="filter-btn" data-category="home">🏠 Home</button>
+          <button class="filter-btn" data-category="school">🏫 School</button>
+          <button class="filter-btn" data-category="agriculture">🌱 Agriculture</button>
+          <button class="filter-btn" data-category="sanitation">🧼 Sanitation</button>
+        </div>
+
+        <div id="tipsGrid" class="tips-grid">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION 8: EDUCATIONAL AWARENESS HUB ─────── -->
+    <section class="page-section" id="awareness">
+      <div class="container">
+        <div class="section-header">
+          <h1>📚 Educational Awareness Hub</h1>
+          <p class="section-sub">Learn about water purification, sanitation rights, and groundwater protection</p>
+        </div>
+
+        <div class="awareness-grid" id="awarenessGrid">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════
+       FOOTER
+  ════════════════════════════════════════════════════ -->
+  <footer class="app-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="footer-logo">💧</span>
+        <span><strong>AquaCare</strong> — SDG 6 · 1M1B Initiative</span>
+      </div>
+      <p class="footer-disclaimer">⚠️ Educational and awareness tool only. Not a substitute for professional water testing or municipal safety reports.</p>
+      <p class="footer-copy">© 2025 AquaCare Student Project · Built with 💧 for a sustainable future</p>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════════════════════════════════
+       AI CHAT WIDGET
+  ════════════════════════════════════════════════════ -->
+  <div class="chat-widget" id="chatWidget">
+    <div class="chat-header" id="chatHeader">
+      <div class="chat-title">
+        <span class="chat-avatar">🤖</span>
+        <div>
+          <span class="chat-name">AquaCare Assistant</span>
+          <span class="chat-status">Powered by Gemini AI</span>
+        </div>
+      </div>
+      <button class="chat-toggle-btn" id="chatToggleBtn" aria-label="Toggle chat">✕</button>
+    </div>
+    <div class="chat-body" id="chatBody">
+      <div class="chat-disclaimer">
+        ⚠️ Educational info only. Not professional water safety advice.
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-msg bot">
+          <span class="msg-avatar">💧</span>
+          <div class="msg-bubble">
+            Hi! I'm the AquaCare Assistant. Ask me about water conservation, hygiene practices, purification methods, or sanitation tips. How can I help you today?
+          </div>
+        </div>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" placeholder="Ask about water & sanitation…" maxlength="500" />
+        <button class="btn btn-primary" id="chatSendBtn">Send</button>
+      </div>
+    </div>
+  </div>
+  <button class="chat-fab" id="chatFab" aria-label="Open AI Chat Assistant">
+    <span>💬</span>
+    <span class="fab-label">AI Help</span>
+  </button>
+
+  <!-- JS Modules -->
+  <script src="/js/app.js"></script>
+  <script src="/js/tracker.js"></script>
+  <script src="/js/harvesting.js"></script>
+  <script src="/js/community.js"></script>
+  <script src="/js/sanitation.js"></script>
+  <script src="/js/tips.js"></script>
+  <script src="/js/ai.js"></script>
+</body>
+</html>
