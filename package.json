@@ -1,0 +1,21 @@
+{
+  "name": "aquacare",
+  "version": "1.0.0",
+  "description": "AquaCare – Smart Water & Sanitation Awareness System aligned with UN SDG 6",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  },
+  "keywords": ["water", "sanitation", "SDG6", "sustainability", "1M1B"],
+  "license": "MIT"
+}
